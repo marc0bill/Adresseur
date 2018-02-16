@@ -11,7 +11,7 @@
 ;******************************************************************************
   LIST p=18f2331,f=INHX32,r=DEC; Definition du microcontroleur
   #include<p18f2331.inc>       ; Fichier include
-  CONFIG OSC = XT,  DEBUG = OFF, WDTEN=OFF, LVP = OFF ; 4MHz
+  CONFIG OSC = HSPLL,  DEBUG = OFF, WDTEN=OFF, LVP = OFF ; 16MHz
 
 ;******************************************************************************
 ;  DEFINITION DE SYMBOLES ET MACRO
@@ -23,16 +23,18 @@ movlf MACRO Value, Registre
 
 ; -- UART CONFIGURATION
   ;Pour Fosc=40Mhz
-  ;#define SPBRGVal 11	; 921 600 Baud
-  ;#define SPBRGVal 43 	; 230 400 Baud
-  ;#define SPBRGVal 86 	; 115 200 Baud
-  ;#define SPBRGVal 172	;  57 600 Baud
+  ;#define SPBRGVal 11  ; 921 600 Baud
+  ;#define SPBRGVal 43  ; 230 400 Baud
+  ;#define SPBRGVal 86  ; 115 200 Baud
+  ;#define SPBRGVal 172 ;  57 600 Baud
+  ;Pour Fosc=16Mhz
+  #define SPBRGVal 69   ;  57 600 Baud
   ;Pour Fosc=8Mhz
-  ;#define SPBRGVal 207	;  9 600 Baud
-  ;#define SPBRGVal 103	;  19 200 Baud
-  ;#define SPBRGVal 34	;  57 600 Baud
+  ;#define SPBRGVal 207 ;  9 600 Baud
+  ;#define SPBRGVal 103 ;  19 200 Baud
+  ;#define SPBRGVal 34  ;  57 600 Baud
   ;Pour Fosc=4Mhz
-  #define SPBRGVal 17  ;  57 600 Baud
+  ;#define SPBRGVal 17  ;  57 600 Baud
   #define UTX_LEN 6
   #define URC_LEN 50
   #define FLAG_RC_END 0
