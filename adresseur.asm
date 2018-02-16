@@ -1,7 +1,13 @@
 ;******************************************************************************
-; TITLE: 
-; AUTHOR:
+; TITLE: Firmware du module d'adressage
+; AUTHOR: Marc Bocquet
 ; DESCRIPTION: 
+; A chaque frond montant sur RC3, l'adresse est incremente et est recopie
+; sur le port B et le port C.
+; L'adresse peut etre force directement par l'envoie sur UART de la valeur en
+; ASCII. La chaine de caratere doit ce terminer par \r\n 
+; Chaque modification de l'adresse provoque l'envoie de l'adresse sur l'UART 
+; sous format ASCII.
 ;******************************************************************************
   LIST p=18f2331,f=INHX32,r=DEC; Definition du microcontroleur
   #include<p18f2331.inc>       ; Fichier include
