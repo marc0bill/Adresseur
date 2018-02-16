@@ -179,7 +179,7 @@ TXAdress900
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '9', UTx_str+1
-  
+  bra TXAdress90
   
 TXAdress800
   movlw 3
@@ -192,6 +192,7 @@ TXAdress800
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '8', UTx_str+1
+  bra TXAdress90
   
 TXAdress700
   movlw 2
@@ -204,6 +205,7 @@ TXAdress700
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '7', UTx_str+1
+  bra TXAdress90
   
 TXAdress600
   movlw 2
@@ -216,6 +218,7 @@ TXAdress600
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '6', UTx_str+1
+  bra TXAdress90
   
 TXAdress500
   movlw 1
@@ -228,6 +231,7 @@ TXAdress500
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '5', UTx_str+1
+  bra TXAdress90
   
 TXAdress400
   movlw 1
@@ -240,6 +244,7 @@ TXAdress400
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '4', UTx_str+1
+  bra TXAdress90
   
 TXAdress300
   movlw 1
@@ -252,6 +257,7 @@ TXAdress300
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '3', UTx_str+1
+  bra TXAdress90
 
 TXAdress200
   movlw 0
@@ -264,6 +270,7 @@ TXAdress200
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '2', UTx_str+1 
+  bra TXAdress90
   
 TXAdress100
   movlw 0
@@ -276,6 +283,7 @@ TXAdress100
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '1', UTx_str+1
+
   
 TXAdress90
   movlw 0
@@ -288,6 +296,7 @@ TXAdress90
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '9', UTx_str+2
+  bra TXAdress0
   
 TXAdress80
   movlw 0
@@ -300,6 +309,7 @@ TXAdress80
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '8', UTx_str+2
+  bra TXAdress0
 
 TXAdress70
   movlw 0
@@ -312,6 +322,7 @@ TXAdress70
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '7', UTx_str+2
+  bra TXAdress0
   
 TXAdress60
   movlw 0
@@ -324,6 +335,7 @@ TXAdress60
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '6', UTx_str+2
+  bra TXAdress0
   
 TXAdress50
   movlw 0
@@ -336,6 +348,7 @@ TXAdress50
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '5', UTx_str+2
+  bra TXAdress0
   
 TXAdress40
   movlw 0
@@ -348,6 +361,7 @@ TXAdress40
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '4', UTx_str+2
+  bra TXAdress0
   
 TXAdress30
   movlw 0
@@ -360,6 +374,7 @@ TXAdress30
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '3', UTx_str+2
+  bra TXAdress0
   
 TXAdress20
   movlw 0
@@ -372,6 +387,7 @@ TXAdress20
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '2', UTx_str+2
+  bra TXAdress0
   
 TXAdress10
   movlw 0
