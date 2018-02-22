@@ -1,13 +1,7 @@
 ;******************************************************************************
-; TITLE: Firmware du module d'adressage
-; AUTHOR: Marc Bocquet
+; TITLE: 
+; AUTHOR:
 ; DESCRIPTION: 
-; A chaque frond montant sur RC3, l'adresse est incremente et est recopie
-; sur le port B et le port C.
-; L'adresse peut etre force directement par l'envoie sur UART de la valeur en
-; ASCII. La chaine de caratere doit ce terminer par \r\n 
-; Chaque modification de l'adresse provoque l'envoie de l'adresse sur l'UART 
-; sous format ASCII.
 ;******************************************************************************
   LIST p=18f2331,f=INHX32,r=DEC; Definition du microcontroleur
   #include<p18f2331.inc>       ; Fichier include
@@ -23,21 +17,22 @@ movlf MACRO Value, Registre
 
 ; -- UART CONFIGURATION
   ;Pour Fosc=40Mhz
-  ;#define SPBRGVal 11  ; 921 600 Baud
-  ;#define SPBRGVal 43  ; 230 400 Baud
-  ;#define SPBRGVal 86  ; 115 200 Baud
-  ;#define SPBRGVal 172 ;  57 600 Baud
+  ;#define SPBRGVal 11	; 921 600 Baud
+  ;#define SPBRGVal 43 	; 230 400 Baud
+  ;#define SPBRGVal 86 	; 115 200 Baud
+  ;#define SPBRGVal 172	;  57 600 Baud
   ;Pour Fosc=16Mhz
-  #define SPBRGVal 69   ;  57 600 Baud
-  ;Pour Fosc=8Mhz
-  ;#define SPBRGVal 207 ;  9 600 Baud
-  ;#define SPBRGVal 103 ;  19 200 Baud
-  ;#define SPBRGVal 34  ;  57 600 Baud
-  ;Pour Fosc=4Mhz
-  ;#define SPBRGVal 17  ;  57 600 Baud
+  #define SPBRGVal 68	;  57 600 Baud
+  ;#define SPBRGVal 103	;  38 400 Baud
+  ;#define SPBRGVal 138	;  28 800 Baud
+  ;#define SPBRGVal 207	;  19 200 Baud
+  ;Pour Fosc=10Mhz
+  ;#define SPBRGVal 43	;  57 600 Baud
+  ;#define SPBRGVal 172	;  14 400 Baud
   #define UTX_LEN 6
   #define URC_LEN 50
   #define FLAG_RC_END 0
+  #define FLAG_NEWVAL 1
 ;******************************************************************************
 ;  VARIABLE dans ACCESS RAM
 ;******************************************************************************
@@ -139,7 +134,7 @@ nexthp
   movff valAdress, LATB
   movff valAdress+1, LATC
   
-  call TXAdress
+  BSF flag, FLAG_NEWVAL
   
   retfie FAST
 
@@ -161,7 +156,7 @@ TXAdress
   
   movlw 3
   CPFSEQ temp2
-  bra TXAdress900
+  bra TXAdress700
   movlw 0xE7
   CPFSGT temp1
   bra TXAdress900
@@ -169,11 +164,9 @@ TXAdress
   SUBWF temp1, f         ; (f) - (W) ->?dest
   movlf '1', UTx_str
   clrf temp2
+  goto TXAdress90
   
 TXAdress900
-  movlw 3
-  CPFSEQ temp2
-  bra TXAdress800
   movlw 0x83
   CPFSGT temp1
   bra TXAdress800
@@ -181,25 +174,29 @@ TXAdress900
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '9', UTx_str+1
-  bra TXAdress90
-  
+  goto TXAdress90
+    
 TXAdress800
-  movlw 3
-  CPFSEQ temp2
-  bra TXAdress700
   movlw 0x1F
   CPFSGT temp1
-  bra TXAdress700
+  bra TXAdress768
   incf WREG
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '8', UTx_str+1
-  bra TXAdress90
+  goto TXAdress90
+  
+TXAdress768
+  clrf temp2
+  movlf '7', UTx_str+1 
+  movlw 68
+  ADDWF temp1, f
+  goto TXAdress90
   
 TXAdress700
   movlw 2
   CPFSEQ temp2
-  bra TXAdress600
+  bra TXAdress500
   movlw 0xBB
   CPFSGT temp1
   bra TXAdress600
@@ -207,25 +204,29 @@ TXAdress700
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '7', UTx_str+1
-  bra TXAdress90
+  goto TXAdress90
   
 TXAdress600
-  movlw 2
-  CPFSEQ temp2
-  bra TXAdress500
   movlw 0x57
   CPFSGT temp1
-  bra TXAdress500
+  bra TXAdress512
   incf WREG
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '6', UTx_str+1
-  bra TXAdress90
+  goto TXAdress90
+  
+TXAdress512
+  clrf temp2
+  movlf '5', UTx_str+1 
+  movlw 12
+  ADDWF temp1, f
+  goto TXAdress90
   
 TXAdress500
   movlw 1
   CPFSEQ temp2
-  bra TXAdress400
+  bra TXAdress200
   movlw 0xF3
   CPFSGT temp1
   bra TXAdress400
@@ -233,12 +234,9 @@ TXAdress500
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '5', UTx_str+1
-  bra TXAdress90
+  goto TXAdress90
   
 TXAdress400
-  movlw 1
-  CPFSEQ temp2
-  bra TXAdress300
   movlw 0x8F
   CPFSGT temp1
   bra TXAdress300
@@ -246,25 +244,26 @@ TXAdress400
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '4', UTx_str+1
-  bra TXAdress90
+  goto TXAdress90
   
 TXAdress300
-  movlw 1
-  CPFSEQ temp2
-  bra TXAdress200
   movlw 0x2B
   CPFSGT temp1
-  bra TXAdress200
+  bra TXAdress256
   incf WREG
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '3', UTx_str+1
-  bra TXAdress90
-
+  goto TXAdress90
+  
+TXAdress256
+  clrf temp2
+  movlf '2', UTx_str+1 
+  movlw 56
+  ADDWF temp1, f
+  goto TXAdress90
+  
 TXAdress200
-  movlw 0
-  CPFSEQ temp2
-  bra TXAdress100
   movlw 0xC7
   CPFSGT temp1
   bra TXAdress100
@@ -272,12 +271,9 @@ TXAdress200
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '2', UTx_str+1 
-  bra TXAdress90
+  goto TXAdress90
   
 TXAdress100
-  movlw 0
-  CPFSEQ temp2
-  bra TXAdress90
   movlw 0x63
   CPFSGT temp1
   bra TXAdress90
@@ -285,12 +281,8 @@ TXAdress100
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '1', UTx_str+1
-
   
 TXAdress90
-  movlw 0
-  CPFSEQ temp2
-  bra TXAdress80
   movlw 0x59
   CPFSGT temp1
   bra TXAdress80
@@ -298,12 +290,9 @@ TXAdress90
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '9', UTx_str+2
-  bra TXAdress0
+  goto TXAdress0
   
 TXAdress80
-  movlw 0
-  CPFSEQ temp2
-  bra TXAdress70
   movlw 0x4F
   CPFSGT temp1
   bra TXAdress70
@@ -311,12 +300,9 @@ TXAdress80
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '8', UTx_str+2
-  bra TXAdress0
+  goto TXAdress0
 
 TXAdress70
-  movlw 0
-  CPFSEQ temp2
-  bra TXAdress60
   movlw 0x45
   CPFSGT temp1
   bra TXAdress60
@@ -324,12 +310,9 @@ TXAdress70
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '7', UTx_str+2
-  bra TXAdress0
+  goto TXAdress0
   
 TXAdress60
-  movlw 0
-  CPFSEQ temp2
-  bra TXAdress50
   movlw 0x3B
   CPFSGT temp1
   bra TXAdress50
@@ -337,12 +320,9 @@ TXAdress60
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '6', UTx_str+2
-  bra TXAdress0
+  goto TXAdress0
   
 TXAdress50
-  movlw 0
-  CPFSEQ temp2
-  bra TXAdress40
   movlw 0x31
   CPFSGT temp1
   bra TXAdress40
@@ -350,12 +330,9 @@ TXAdress50
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '5', UTx_str+2
-  bra TXAdress0
+  goto TXAdress0
   
 TXAdress40
-  movlw 0
-  CPFSEQ temp2
-  bra TXAdress30
   movlw 0x27
   CPFSGT temp1
   bra TXAdress30
@@ -363,12 +340,9 @@ TXAdress40
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '4', UTx_str+2
-  bra TXAdress0
+  goto TXAdress0
   
 TXAdress30
-  movlw 0
-  CPFSEQ temp2
-  bra TXAdress20
   movlw 0x1D
   CPFSGT temp1
   bra TXAdress20
@@ -376,12 +350,9 @@ TXAdress30
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '3', UTx_str+2
-  bra TXAdress0
+  goto TXAdress0
   
 TXAdress20
-  movlw 0
-  CPFSEQ temp2
-  bra TXAdress10
   movlw 0x13
   CPFSGT temp1
   bra TXAdress10
@@ -389,12 +360,9 @@ TXAdress20
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '2', UTx_str+2
-  bra TXAdress0
+  goto TXAdress0
   
 TXAdress10
-  movlw 0
-  CPFSEQ temp2
-  bra TXAdress0
   movlw 0x09
   CPFSGT temp1
   bra TXAdress0
@@ -402,7 +370,6 @@ TXAdress10
   SUBWF temp1, f         ; (f) - (W) ->?dest
   clrf temp2
   movlf '1', UTx_str+2
-  
   
 TXAdress0
   movf temp1, w
@@ -412,15 +379,15 @@ TXAdress0
   clrf UTx_i
   BSF PIE1, TXIE    ; Enable Interrupt  
   movlb 0
+  BCF flag, FLAG_NEWVAL
+  
+  
   return
   
   
 ;--- PROGRAMME PRINCIPAL ------------------------------------------------------
 main
   movlb 0
-  BSF OSCCON, IRCF0
-  BSF OSCCON, IRCF1
-  BSF OSCCON, IRCF2   
 ; ------------------------- PIC  CONFIGURATION --------------------------------
 ; UART CONFIGURATION
   BSF TRISC, TRISC6	;
@@ -440,6 +407,7 @@ main
   CLRF UTx_size
   CLRF UTx_i
   CLRF URc_i
+  CLRF flag
   LFSR FSR0, UTx_str
   LFSR FSR1, URc_str
   LFSR FSR2, URc_str
@@ -475,6 +443,9 @@ main
   
 ;--- Boucle infinie ---
 boubleinf
+  BTFSC flag, FLAG_NEWVAL
+  call TXAdress
+  
   BTFSS flag, FLAG_RC_END
   bra boubleinf
   bcf flag, FLAG_RC_END
@@ -517,7 +488,7 @@ nextURc
   movff valAdress, LATB
   movff valAdress+1, LATC
   
-  call TXAdress
+  BSF flag, FLAG_NEWVAL
   
   bra boubleinf
 
