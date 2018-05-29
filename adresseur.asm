@@ -15,6 +15,8 @@ movlf MACRO Value, Registre
   movwf Registre
   endm
 
+
+
 ; -- UART CONFIGURATION
   ;Pour Fosc=40Mhz
   ;#define SPBRGVal 11	; 921 600 Baud
